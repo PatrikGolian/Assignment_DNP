@@ -9,6 +9,36 @@ public class CommentInMemoryRepository : ICommentRepository
     private List<Comment> comments = new();
     
     
+    public CommentInMemoryRepository()
+    {
+        SomeDummyData();
+    }
+
+    private void SomeDummyData()
+    {
+        comments.Add(new Comment
+        {
+            Id = 1,
+            Body = "First comment!",
+            PostId = 1,
+            UserId = 2
+        });
+        comments.Add(new Comment
+        {
+            Id = 2,
+            Body = "Second comment.",
+            PostId = 1,
+            UserId = 3
+        });
+        comments.Add(new Comment
+        {
+            Id = 3,
+            Body = "Third comm.",
+            PostId = 2,
+            UserId = 1
+        });
+    }
+    
     public Task<Comment> AddAsync(Comment comment)
     {
         comment.Id = comments.Any()
