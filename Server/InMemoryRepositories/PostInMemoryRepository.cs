@@ -23,14 +23,14 @@ public class PostInMemoryRepository : IPostRepository
         });
         posts.Add(new Post
         {
-            Id = 2,
+            Id = 3,
             Title = "Second Post",
             Body = "Another example post.",
             UserId = 2
         });
         posts.Add(new Post
         {
-            Id = 3,
+            Id = 2,
             Title = "Third Post",
             Body = "BlaBla",
             UserId = 3    

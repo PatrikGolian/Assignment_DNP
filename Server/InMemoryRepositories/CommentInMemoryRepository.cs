@@ -25,14 +25,14 @@ public class CommentInMemoryRepository : ICommentRepository
         });
         comments.Add(new Comment
         {
-            Id = 2,
+            Id = 3,
             Body = "Second comment.",
             PostId = 1,
             UserId = 3
         });
         comments.Add(new Comment
         {
-            Id = 3,
+            Id = 2,
             Body = "Third comm.",
             PostId = 2,
             UserId = 1
