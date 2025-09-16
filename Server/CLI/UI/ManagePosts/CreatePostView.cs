@@ -12,7 +12,7 @@ public class CreatePostView
         this.postRepo = postRepo;
     }
 
-    public async Task ShowAsync()
+    public async Task CreatePostAsync()
     {
         Console.Clear();
         Console.WriteLine("=== Create Post ===");

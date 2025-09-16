@@ -11,7 +11,7 @@ public class ListPostsView
         this.postRepo = postRepo;
     }
 
-    public async Task ShowAsync()
+    public async Task PostsListAsync()
     {
         Console.Clear();
         Console.WriteLine("=== Posts Overview ===");

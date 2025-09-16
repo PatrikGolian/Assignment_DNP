@@ -29,7 +29,8 @@ public class CliApp
         while (running)
         {
             Console.Clear();
-            Console.WriteLine("=== LEGO CLI ===");
+            Console.WriteLine("=== Starting CLI ===");
+            Console.WriteLine("=== Please choose your action ===");
             Console.WriteLine("1. Create user");
             Console.WriteLine("2. List users");
             Console.WriteLine("3. Create post");
@@ -43,22 +44,25 @@ public class CliApp
             switch (choice)
             {
                 case "1":
-                    await new CreateUserView(userRepo).ShowAsync();
+                    await new CreateUserView(userRepo).CreateUserAsync();
                     break;
                 case "2":
-                    await new ListUsersView(userRepo).ShowAsync();
+                    await new ListUsersView(userRepo).UsersListAsync();
                     break;
                 case "3":
-                    await new CreatePostView(postRepo).ShowAsync();
+                    await new CreatePostView(postRepo).CreatePostAsync();
                     break;
                 case "4":
-                    await new ListPostsView(postRepo).ShowAsync();
+                    await new ListPostsView(postRepo).PostsListAsync();
                     break;
                 case "5":
-                    await new SinglePostView(postRepo, commentRepo).ShowAsync();
+                    await new SinglePostView(postRepo, commentRepo).SinglePostAsync();
                     break;
                 case "6":
-                    await new CreateCommentView(commentRepo).ShowAsync();
+                    await new CreateCommentView(commentRepo, postRepo, userRepo).CreateCommentAsync();
+                    break;
+                case "7":
+                    await new FilterUsersView(userRepo).FilteredUsersAsync();
                     break;
                 case "0":
                     running = false;

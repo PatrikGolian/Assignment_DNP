@@ -12,7 +12,7 @@ public class CreateUserView
         this.userRepo = userRepo;
     }
 
-    public async Task ShowAsync()
+    public async Task CreateUserAsync()
     {
         Console.Clear();
         Console.WriteLine("=== Create User ===");

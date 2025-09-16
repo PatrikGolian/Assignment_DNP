@@ -11,7 +11,7 @@ public class ListUsersView
         this.userRepo = userRepo;
     }
 
-    public async Task ShowAsync()
+    public async Task UsersListAsync()
     {
         Console.Clear();
         Console.WriteLine("=== Users ===");

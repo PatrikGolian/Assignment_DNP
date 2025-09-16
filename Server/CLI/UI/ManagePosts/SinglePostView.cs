@@ -14,7 +14,7 @@ public class SinglePostView
         this.commentRepo = commentRepo;
     }
 
-    public async Task ShowAsync()
+    public async Task SinglePostAsync()
     {
         Console.Clear();
         Console.WriteLine("=== View Specific Post ===");
