@@ -38,7 +38,8 @@ public class CliApp
             Console.WriteLine("5. View specific post");
             Console.WriteLine("6. Add comment to post");
             Console.WriteLine("0. Exit");
-            Console.Write("> ");
+            
+            
             string? choice = Console.ReadLine();
 
             switch (choice)
