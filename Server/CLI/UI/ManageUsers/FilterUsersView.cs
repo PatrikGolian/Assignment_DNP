@@ -4,11 +4,11 @@ namespace CLI.UI.ManageUsers;
 
 public class FilterUsersView
 {
-    private readonly IUserRepository _userRepo;
+    private readonly IUserRepository userRepo;
 
     public FilterUsersView(IUserRepository userRepo)
     {
-        _userRepo = userRepo;
+        this.userRepo = userRepo;
     }
 
     public async Task FilteredUsersAsync()
@@ -18,7 +18,7 @@ public class FilterUsersView
         Console.Write("Enter part of username to search for: ");
         string? keyword = Console.ReadLine();
 
-        var users = _userRepo.GetManyAsync();
+        var users = userRepo.GetManyAsync();
 
         // filter: case-insensitive contains
         var filtered = string.IsNullOrWhiteSpace(keyword)
