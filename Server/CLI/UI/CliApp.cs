@@ -37,6 +37,7 @@ public class CliApp
             Console.WriteLine("4. View posts overview");
             Console.WriteLine("5. View specific post");
             Console.WriteLine("6. Add comment to post");
+            Console.WriteLine("7. Filter users by part of user name");
             Console.WriteLine("0. Exit");
             
             
