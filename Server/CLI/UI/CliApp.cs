@@ -5,7 +5,6 @@ using CLI.UI.ManageUsers;
 namespace CLI.UI;
 
 using CLI.UI;
-using InMemoryRepositories;
 using RepositoryContracts;
 public class CliApp
 {
