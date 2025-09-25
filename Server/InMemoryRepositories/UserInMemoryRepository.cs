@@ -10,14 +10,14 @@ public class UserInMemoryRepository : IUserRepository
 
     public UserInMemoryRepository()
     {
-        SomeDummyData();
+        //SomeDummyData();
     }
-    private void SomeDummyData()
-    {
-        users.Add(new User { Id = 1, Username = "alice", Password = "password1" });
-        users.Add(new User { Id = 3, Username = "bob", Password = "password2" });
-        users.Add(new User { Id = 2, Username = "charlie", Password = "password3" });
-    }
+    // private void SomeDummyData()
+    // {
+    //     users.Add(new User { Id = 1, Username = "alice", Password = "password1" });
+    //     users.Add(new User { Id = 3, Username = "bob", Password = "password2" });
+    //     users.Add(new User { Id = 2, Username = "charlie", Password = "password3" });
+    // }
     
     public Task<User> AddAsync(User user)
     {
