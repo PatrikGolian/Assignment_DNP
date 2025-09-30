@@ -115,7 +115,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteUser(int id)
+    public async Task<ActionResult> DeleteUser(int id)
     {
         User? user = await userRepo.GetSingleAsync(id);
         if (user == null)
@@ -130,10 +130,9 @@ public class UsersController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<UserDto>> GetAllUsers()
     {
-        // Get all users from repo
+        
         var users = userRepo.GetManyAsync();
-
-        // Map to DTOs
+        
         var dtos = users.Select(u => new UserDto
         {
             Id = u.Id,
@@ -142,6 +141,26 @@ public class UsersController : ControllerBase
 
         return Ok(dtos);
     }
+    [HttpGet]
+    public ActionResult<IEnumerable<UserDto>> GetAllUsers([FromQuery] string? search)
+    {
+        var users = userRepo.GetManyAsync();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            users = users.Where(u =>
+                u.Username.Contains(search, StringComparison.OrdinalIgnoreCase));
+        }
+
+        var dtos = users.Select(u => new UserDto
+        {
+            Id = u.Id,
+            UserName = u.Username
+        }).ToList();
+
+        return Ok(dtos);
+    }
+
 
     private Task<bool> VerifyUserNameIsAvailableAsync(string userName)
     {
@@ -158,7 +177,7 @@ public class UsersController : ControllerBase
         if (string.IsNullOrWhiteSpace(password) || password.Length < 4)
             return false;
 
-        else return true;
+        return true;
 
     }
     

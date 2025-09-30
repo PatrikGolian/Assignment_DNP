@@ -20,7 +20,7 @@ public class FilterUsersView
 
         var users = userRepo.GetManyAsync();
 
-        // filter: case-insensitive contains
+        
         var filtered = string.IsNullOrWhiteSpace(keyword)
             ? users
             : users.Where(u => u.Username.Contains(keyword!, StringComparison.OrdinalIgnoreCase));
