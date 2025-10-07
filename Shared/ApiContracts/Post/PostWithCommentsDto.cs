@@ -8,5 +8,5 @@ public class PostWithCommentsDto
     public int UserId { get; set; }
     public string UserName { get; set; } // author username
 
-    public List<CommentDto> Comments { get; set; } = new();
+    public List<CommentWithUsernameDto> Comments { get; set; } = new();
 }

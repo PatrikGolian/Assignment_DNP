@@ -82,7 +82,7 @@ public class PostsController : ControllerBase
         var author = await userRepo.GetSingleAsync(post.UserId);
 
         var comments = commentRepo.GetManyAsync().Where(c => c.PostId == id)
-            .Select(c => new CommentDto()
+            .Select(c => new CommentWithUsernameDto()
             {
                 Id = c.Id,
                 Body = c.Body,
@@ -125,20 +125,20 @@ public class PostsController : ControllerBase
     {
         var posts = postRepo.GetManyAsync();
 
-        // Filter by title substring
+        // by title 
         if (!string.IsNullOrWhiteSpace(title))
         {
             posts = posts.Where(p =>
                 p.Title.Contains(title, StringComparison.OrdinalIgnoreCase));
         }
 
-        // Filter by user id
+        // by user id
         if (userId.HasValue)
         {
             posts = posts.Where(p => p.UserId == userId.Value);
         }
 
-        // Filter by username
+        //  by username
         if (!string.IsNullOrWhiteSpace(username))
         {
             // Need access to users to check names

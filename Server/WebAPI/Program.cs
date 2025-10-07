@@ -31,3 +31,4 @@ app.UseHttpsRedirection();
 
 app.Run();
 
+//https://localhost:5154/openapi/v1.json
