@@ -106,6 +106,7 @@ public class CommentController : ControllerBase
         return NoContent();
     }
     
+    [HttpGet]
     public ActionResult<IEnumerable<CommentDto>> GetAllComments(
         [FromQuery] int? postId,
         [FromQuery] int? userId,

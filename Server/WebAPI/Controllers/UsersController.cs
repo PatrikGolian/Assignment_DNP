@@ -15,7 +15,7 @@ public class UsersController : ControllerBase
 
     public UsersController(IUserRepository userRepo)
     {
-        this.userRepo = this.userRepo;
+        this.userRepo = userRepo;
     }
 
     [HttpPost]
@@ -127,7 +127,7 @@ public class UsersController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet]
+    /*[HttpGet]
     public ActionResult<IEnumerable<UserDto>> GetAllUsers()
     {
         
@@ -140,7 +140,7 @@ public class UsersController : ControllerBase
         }).ToList();
 
         return Ok(dtos);
-    }
+    }*/
     [HttpGet]
     public ActionResult<IEnumerable<UserDto>> GetAllUsers([FromQuery] string? search)
     {
