@@ -21,11 +21,11 @@ public class HttpPostService : IPostService
         
     }
     
-    public async Task<PostDto?> GetPostAsync(int id)
+    public async Task<PostWithCommentsDto> GetPostAsync(int id)
     {
-        var response = await client.GetAsync($"posts{id}");
+        var response = await client.GetAsync($"posts/{id}");
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<PostDto>() ?? throw new InvalidOperationException("User not found");
+        return await response.Content.ReadFromJsonAsync<PostWithCommentsDto>() ?? throw new InvalidOperationException("User not found");
     }
 
     public Task<List<PostDto>?> GetPostsAsync()

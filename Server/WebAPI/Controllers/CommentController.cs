@@ -28,7 +28,7 @@ public class CommentController : ControllerBase
     {
         var comment = new Comment
         { 
-            Body = request.Body,
+            Body = request.body,
             PostId = request.PostId,
             UserId = request.UserId
         };

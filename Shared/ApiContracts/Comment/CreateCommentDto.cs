@@ -1,8 +1,3 @@
 ﻿namespace ApiContracts;
 
-public class CreateCommentDto
-{
-    public string Body { get; set; }
-    public int PostId { get; set; }
-    public int UserId { get; set; }
-}
+public record CreateCommentDto(string body, int PostId, int UserId);

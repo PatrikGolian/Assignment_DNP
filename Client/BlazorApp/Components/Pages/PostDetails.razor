@@ -1,0 +1,89 @@
+﻿@page "/posts/{PostId:int}"
+@using BlazorApp.Services
+@using ApiContracts
+@using ApiContracts.Post
+@inject IPostService PostService
+@inject IUserService UserService
+@inject ICommentService CommentService
+
+
+<h3>Post Details</h3>
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+@if (postWithComments == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <h4>@postWithComments.Post.Title</h4>
+            <h6 class="text-muted">by @postWithComments.Post.UserId</h6>
+            <p>@postWithComments.Post.Body</p>
+        </div>
+    </div>
+
+    <h5>Comments</h5>
+    @if (postWithComments.Comments.Any())
+    {
+        <ul class="list-group mb-3">
+            @foreach (var comment in postWithComments.Comments)
+            {
+                <li class="list-group-item">
+                    <strong>@comment.UserId:</strong> @comment.Body
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No comments yet.</p>
+    }
+
+    <div class="mb-3">
+        <textarea class="form-control" @bind="newComment" placeholder="Add a comment..."></textarea>
+        <button class="btn btn-primary mt-2" @onclick="AddCommentAsync">Post Comment</button>
+    </div>
+}
+
+@code {
+
+    private string errorMessage = "";
+    private PostWithCommentsDto? postWithComments;
+    [Parameter] public int PostId { get; set; }
+    private string newComment = "";
+    private int userId = 2;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            postWithComments = await PostService.GetPostAsync(PostId);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading post: {ex.Message}";
+        }
+    }
+    
+    private async Task AddCommentAsync()
+    {
+        if (string.IsNullOrWhiteSpace(newComment)) return;
+
+        try
+        {
+            var comment = await CommentService.AddCommentAsync(new CreateCommentDto(newComment, PostId, userId));
+            postWithComments?.Comments.Add(comment);
+            newComment = "";
+            StateHasChanged();
+        }
+        catch(Exception ex)
+        {
+            errorMessage = $"Failed to add comment: {ex.Message}";
+        }
+    }
+
+}

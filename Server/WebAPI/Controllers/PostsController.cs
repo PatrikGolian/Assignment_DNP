@@ -69,39 +69,53 @@ public class PostsController : ControllerBase
         return Ok(dto);
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<PostDto>> GetPostById(int id)
+    [HttpGet("{postId:int}")]
+    public async Task<ActionResult<PostWithCommentsDto>> GetSinglePost(int postId)
     {
-        Post? post = await postRepo.GetSingleAsync(id);
+        // Get the post
+        Post post = await postRepo.GetSingleAsync(postId);
         if (post == null)
+            return NotFound($"Post with ID {postId} was not found.");
+
+        // Get comments and users
+        List<Comment> allComments = commentRepo.GetManyAsync().ToList();
+        List<Comment> postComments = allComments.Where(c => c.PostId == postId).ToList();
+        List<User> users = userRepo.GetManyAsync().ToList();
+
+        // Map comments to DTOs using object initializers (match your DTO shape)
+        List<CommentDto> commentDtos = new List<CommentDto>();
+        foreach (Comment comment in postComments)
         {
-            return NotFound($"Post with ID {id} was not found.");
-            
+            commentDtos.Add(new CommentDto
+            {
+                Id = comment.Id,
+                Body = comment.Body,
+                UserId = comment.UserId,
+                PostId = comment.PostId
+            });
         }
 
-        var author = await userRepo.GetSingleAsync(post.UserId);
-
-        var comments = commentRepo.GetManyAsync().Where(c => c.PostId == id)
-            .Select(c => new CommentWithUsernameDto()
-            {
-                Id = c.Id,
-                Body = c.Body,
-                UserId = c.UserId,
-                UserName = userRepo.GetSingleAsync(c.UserId).Result.Username,
-                PostId = c.PostId
-            }).ToList();
-
-        PostWithCommentsDto dto = new()
+        // Map post to DTO using object initializer
+        PostDto postDto = new PostDto
         {
             Id = post.Id,
             Title = post.Title,
             Body = post.Body,
-            UserId = post.UserId,
-            UserName = author.Username,
-            Comments = comments
+            UserId = post.UserId
         };
+
+        // Create PostWithCommentsDto.
+        // If PostWithCommentsDto has a constructor taking (PostDto, List<CommentDto>) use that,
+        // otherwise use an object initializer with properties (Post and Comments).
+        PostWithCommentsDto dto = new PostWithCommentsDto(postDto, commentDtos);
+        // OR if it has properties:
+        // PostWithCommentsDto dto = new PostWithCommentsDto { Post = postDto, Comments = commentDtos };
+
         return Ok(dto);
     }
+
+
+
     
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> DeletePost(int id)
