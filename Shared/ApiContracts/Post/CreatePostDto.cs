@@ -1,8 +1,3 @@
 ﻿namespace ApiContracts.Post;
 
-public class CreatePostDto
-{
-    public string Title { get; set; }
-    public string Body { get; set; }
-    public int UserId { get; set; }
-}
+public record CreatePostDto(string Title, string Body, int UserId);

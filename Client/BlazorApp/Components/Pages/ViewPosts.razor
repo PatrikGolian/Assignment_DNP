@@ -1,0 +1,85 @@
+﻿@page "/view-posts"
+@using ApiContracts.Post
+@using BlazorApp.Services
+@inject IUserService UserService
+@inject IPostService PostService
+
+<h3>Create User</h3>
+<p>@statusMessage</p>
+
+@if (isLoading)
+{
+    <p>Loading posts…</p>
+}
+else if (posts.Any())
+{
+    <div class="row">
+        @foreach (var post in posts)
+        {
+            <div class="col-md-12 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@post.Title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">by @GetUsername(post.UserId)</h6>
+                        <p class="card-text">@post.Body</p>
+                        <a class="card-link" href="/posts/@post.Id">Read more</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No posts available.</p>
+}
+
+@code {
+    private List<PostDto> posts = new();
+    private Dictionary<int, string> usernames = new();
+    private string statusMessage = "";
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPostsAndUsersAsync();
+    }
+
+    private async Task LoadPostsAndUsersAsync()
+    {
+        isLoading = true;
+        try
+        {
+            posts = (await PostService.GetPostsAsync())?.ToList() ?? new();
+
+            var users = await UserService.GetUsersAsync();
+            if (users != null)
+            {
+                usernames = users
+                            .GroupBy(u => u.Id)
+                            .ToDictionary(g => g.Key, g => g.First().UserName ?? $"User #{g.Key}");
+            }
+            else
+            {
+                usernames = posts.Select(p => p.UserId).Distinct()
+                                 .ToDictionary(id => id, id => $"User #{id}");
+            }
+
+            statusMessage = $"Loaded {posts.Count} posts.";
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"Error loading posts: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private string GetUsername(int userId)
+    {
+        return usernames.TryGetValue(userId, out var name) ? name : $"User #{userId}";
+    }
+}
