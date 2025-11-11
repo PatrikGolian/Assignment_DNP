@@ -5,7 +5,7 @@
 @inject IPostService PostService
 @inject IUserService UserService
 @inject ICommentService CommentService
-
+@attribute [Authorize]
 
 <h3>Post Details</h3>
 @if (!string.IsNullOrEmpty(errorMessage))

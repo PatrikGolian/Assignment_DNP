@@ -3,7 +3,7 @@
 @using BlazorApp.Services
 @inject IUserService UserService
 @inject IPostService PostService
-
+@attribute [Authorize]
 <h3>Create User</h3>
 <p>@statusMessage</p>
 

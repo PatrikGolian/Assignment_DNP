@@ -47,7 +47,7 @@ public class UsersController : ControllerBase
             UserName = created.Username
 
         };
-        return Created($"/users/{dto.Id}", created);
+        return Created($"/users/{dto.Id}", dto);
 
     }
 
