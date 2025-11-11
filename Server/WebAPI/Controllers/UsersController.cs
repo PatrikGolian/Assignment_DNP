@@ -53,47 +53,50 @@ public class UsersController : ControllerBase
 
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<UserDto>> UpdateUser(int id,
-        [FromBody] UpdateUserDto request)
+    public async Task<ActionResult<UserDto>> UpdateUser(int id, [FromBody] UpdateUserDto request)
     {
-        if (!IsPasswordValid(request.Password))
-        {
-            return BadRequest("Password must be at least 4 characters long.");
-        }
-
-        if (await VerifyUserNameIsAvailableAsync(request.UserName))
-        {
-            return BadRequest(
-                $"Username '{request.UserName}' is already taken.");
-        }
-
         User? existing;
         try
         {
             existing = await userRepo.GetSingleAsync(id);
         }
-        catch(InvalidOperationException)
+        catch (InvalidOperationException)
         {
             return NotFound($"User with ID {id} was not found");
         }
 
-        existing.Username = request.UserName;
-        existing.Password = request.Password;
+        // Only update username if provided and not taken
+        if (!string.IsNullOrWhiteSpace(request.UserName) &&
+            !request.UserName.Equals(existing.Username, StringComparison.OrdinalIgnoreCase))
+        {
+            bool usernameExists = userRepo.GetManyAsync()
+                .Any(u => u.Username.Equals(request.UserName, StringComparison.OrdinalIgnoreCase) && u.Id != id);
+            if (usernameExists)
+                return BadRequest($"Username '{request.UserName}' is already taken.");
+
+            existing.Username = request.UserName;
+        }
+
+        // Only update password if provided
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            if (request.Password.Length < 4)
+                return BadRequest("Password must be at least 4 characters long.");
+
+            existing.Password = request.Password;
+        }
 
         await userRepo.UpdateAsync(existing);
 
-            
-        UserDto dto = new()
-
+        var dto = new UserDto
         {
-
             Id = existing.Id,
-
             UserName = existing.Username
-
         };
+
         return Ok(dto);
     }
+
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<UserDto>> GetUserById(int id)

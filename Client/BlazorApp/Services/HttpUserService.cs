@@ -18,12 +18,12 @@ public class HttpUserService : IUserService
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<UserDto>() ?? throw new InvalidOperationException("Something went wrong, try again later");
     }
-
     public async Task UpdateUserAsync(int id, UpdateUserDto request)
     {
-        var response = await _client.PutAsJsonAsync("users", request);
+        var response = await _client.PutAsJsonAsync($"users/{id}", request);
         response.EnsureSuccessStatusCode();
     }
+
 
     public async Task DeleteUserAsync(int id)
     {

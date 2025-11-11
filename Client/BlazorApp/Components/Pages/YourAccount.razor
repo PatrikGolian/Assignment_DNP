@@ -24,6 +24,20 @@
             <div class="alert alert-danger">@errorMessage</div>
 
         }
+        <h4>Update your profile info</h4>
+        <div>
+            <label>New User Name:</label>
+            <input type="text" @bind="userName" />
+        </div>
+        <br/>
+        <div>
+            <label>New Password:</label>
+            <input type="password" @bind="password" />
+        </div>
+        <button @onclick="updateUserInfoAsync">Update Info</button>
+        <br/>
+        <br/>
+        
         @if (posts == null)
         {
             <p>Loading your posts...</p>
@@ -106,10 +120,12 @@
 @code {
     [CascadingParameter] public Task<AuthenticationState> State { get; set; }
     private int userId;
+    private string userName = "";
+    private string password = "";
+    private UpdateUserDto curentUser;
     private List<PostDto> posts = new();
     private List<CommentDto> comments = new();
     private string errorMessage = "";
-    private UserDto? currentUser;
     
     protected override async Task OnInitializedAsync()
     {
@@ -143,6 +159,39 @@
             errorMessage = $"Failed to load post: {ex.Message}";
         }
     }
+    
+    private async Task updateUserInfoAsync()
+    {
+        try
+        {
+            
+            if (string.IsNullOrWhiteSpace(userName) && string.IsNullOrWhiteSpace(password))
+            {
+                errorMessage = "Please enter at least one field to update.";
+                return;
+            }
+
+            var dto = new UpdateUserDto
+            {
+                UserName = string.IsNullOrWhiteSpace(userName) ? null : userName,
+                Password = string.IsNullOrWhiteSpace(password) ? null : password
+            };
+
+            await UserService.UpdateUserAsync(userId, dto);
+
+            userName = "";
+            password = "";
+            errorMessage = "Your profile was successfully updated!";
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            errorMessage = $"Error updating profile: {e.Message}";
+        }
+    }
+
+
+    
     private async Task LogOutAsync()
     {
         try
