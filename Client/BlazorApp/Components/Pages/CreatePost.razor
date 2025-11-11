@@ -1,4 +1,5 @@
 ﻿@page "/create-post"
+@using System.Security.Claims
 @using ApiContracts
 @using ApiContracts.Post
 @using BlazorApp.Services
@@ -19,11 +20,34 @@
 <button class="btn btn-primary" @onclick="CreatePostt">Register</button>
 
 @code {
+    [CascadingParameter] public Task<AuthenticationState> State { get; set; }
     private string title = "";
     private string body = "";
     private string message = "";
     private int userId = 1;
 
+    protected async override Task OnInitializedAsync()
+    {
+        AuthenticationState authenticationState = await State;
+        ClaimsPrincipal claimsPrincipal = authenticationState.User;
+
+        if (claimsPrincipal.Identity == null || !claimsPrincipal.Identity.IsAuthenticated)
+        {
+            return; // user not logged in
+        }
+
+        var idClaim = claimsPrincipal.Claims
+            .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+        if (idClaim == null)
+        {
+            message = "User ID not found in claims.";
+            return;
+        }
+
+        userId = int.Parse(idClaim.Value);
+    }
+    
     private async Task CreatePostt()
     {
         try

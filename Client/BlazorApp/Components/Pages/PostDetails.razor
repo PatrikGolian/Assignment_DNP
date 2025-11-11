@@ -1,4 +1,5 @@
 ﻿@page "/posts/{PostId:int}"
+@using System.Security.Claims
 @using BlazorApp.Services
 @using ApiContracts
 @using ApiContracts.Post
@@ -50,12 +51,13 @@ else
 }
 
 @code {
+    [CascadingParameter] public Task<AuthenticationState> State { get; set; }
 
     private string errorMessage = "";
     private PostWithCommentsDto? postWithComments;
     [Parameter] public int PostId { get; set; }
     private string newComment = "";
-    private int userId = 2;
+    private int userId;
     
     protected override async Task OnInitializedAsync()
     {
@@ -65,8 +67,23 @@ else
         }
         catch (Exception ex)
         {
-            errorMessage = $"Error loading post: {ex.Message}";
+            errorMessage = $"Failed to load post: {ex.Message}";
         }
+        AuthenticationState authenticationState = await State;
+        ClaimsPrincipal claimsPrincipal = authenticationState.User;
+
+        if (claimsPrincipal.Identity == null || !claimsPrincipal.Identity.IsAuthenticated)
+        {
+            return; // user not logged in
+        }
+        var idClaim = claimsPrincipal.Claims
+            .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (idClaim == null)
+        {
+            errorMessage = "User ID not found in claims.";
+            return;
+        }
+        userId = int.Parse(idClaim.Value); 
     }
     
     private async Task AddCommentAsync()

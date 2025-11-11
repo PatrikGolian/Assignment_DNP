@@ -1,0 +1,159 @@
+﻿@page "/your-account"
+@using System.Security.Claims
+@using ApiContracts
+@using ApiContracts.Post
+@using BlazorApp.Auth
+@using BlazorApp.Services
+@inject IUserService UserService
+@inject IPostService PostService
+@inject ICommentService CommentService
+@inject AuthenticationStateProvider AuthStateProvider
+
+@inject NavigationManager NavMgr 
+
+@attribute [Authorize]
+
+<AuthorizeView>
+    
+    <Authorized>
+        <h3>Hello, @context.User.Identity.Name</h3>
+        <button @onclick="LogOutAsync">Log out</button>
+        
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+
+        }
+        @if (posts == null)
+        {
+            <p>Loading your posts...</p>
+        }
+        else if (!posts.Any())
+        {
+            <p>You haven’t created any posts yet.</p>
+            <button @onclick='() => NavMgr.NavigateTo("create-post")'>Add post</button>
+
+        }
+        else
+        {
+            <h4>Look at your posts!</h4>
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>Post Id</th>
+                    <th>Title</th>
+                    <th>Body</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var post in posts)
+                {
+                    <tr>
+                        <td>@post.Id</td>
+                        <td>@post.Title</td>
+                        <td>@post.Body</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            <br/>
+            <br/>
+            <h5>Want to add more posts?</h5>
+            <br/>
+            <button @onclick='() => NavMgr.NavigateTo("create-post")'>Add post</button>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+        }
+        
+        @if (comments == null)
+        {
+            <p>Loading comments</p>
+        }
+        else if (!comments.Any())
+        {
+            <p>You have not created any comments yet</p>
+        }
+        else
+        {
+            <h4>Your comments</h4>
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>Comment Id</th>
+                    <th>Post Id</th>
+                    <th>Body</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var comment in comments)
+                {
+                    <tr>
+                        <td>@comment.Id</td>
+                        <td>@comment.PostId</td>
+                        <td>@comment.Body</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+        
+        
+    </Authorized> 
+    <NotAuthorized> lol you are not logged in! </NotAuthorized>
+</AuthorizeView> 
+@code {
+    [CascadingParameter] public Task<AuthenticationState> State { get; set; }
+    private int userId;
+    private List<PostDto> posts = new();
+    private List<CommentDto> comments = new();
+    private string errorMessage = "";
+    private UserDto? currentUser;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            AuthenticationState authenticationState = await State;
+            ClaimsPrincipal claimsPrincipal = authenticationState.User;
+
+            if (claimsPrincipal.Identity == null || !claimsPrincipal.Identity.IsAuthenticated)
+            {
+                return; // user not logged in
+            }
+            var idClaim = claimsPrincipal.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (idClaim == null)
+            {
+                errorMessage = "User ID not found in claims.";
+                return;
+            }
+            userId = int.Parse(idClaim.Value); 
+            
+            var allPosts = await PostService.GetPostsAsync();
+            posts = allPosts.Where(p => p.UserId == userId).ToList();
+            
+            var allComents = await CommentService.GetCommentsAsync(); 
+            comments = allComents.Where(c => c.UserId == userId).ToList();
+        }
+        
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to load post: {ex.Message}";
+        }
+    }
+    private async Task LogOutAsync()
+    {
+        try
+        {
+            await ((SimpleAuthProvider)AuthStateProvider).Logout();
+            NavMgr.NavigateTo("/");
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            errorMessage = $"Error: {e.Message}";
+        }
+    }
+}

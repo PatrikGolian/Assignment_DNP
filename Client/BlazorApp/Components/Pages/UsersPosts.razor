@@ -1,0 +1,82 @@
+﻿@page "/users-posts/{userId:int}"
+
+@using BlazorApp.Services
+@using ApiContracts
+@using ApiContracts.Post
+@inject IUserService UserService
+@inject IPostService PostService
+@inject NavigationManager NavMgr 
+
+@attribute [Authorize]
+
+<h3>Posts by @userName</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else if (userPosts == null)
+{
+    <p><em>Loading posts...</em></p>
+}
+else if (!userPosts.Any())
+{
+    <p>This user has not posted anything yet.</p>
+}
+else
+{
+    <h4>Look at @userName 's posts!</h4>
+    <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+            <th>Post Id</th>
+            <th>Title</th>
+            <th>Body</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var post in userPosts)
+        {
+            <tr>
+                <td>@post.Id</td>
+                <td>@post.Title</td>
+                <td>@post.Body</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <button @onclick='() => NavMgr.NavigateTo("view-users")'>Back to users list</button>
+}
+
+
+@code {
+    [Parameter] public int userId { get; set; }
+
+    private string userName = "";
+    private List<PostDto> userPosts = new();
+    private string errorMessage = "";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadUserPostsAsync();
+    }
+
+    private async Task LoadUserPostsAsync()
+    {
+        try
+        {
+            var user = await UserService.GetUserAsync(userId);
+            if (user != null)
+                userName = user.UserName;
+
+            var allPosts = await PostService.GetPostsAsync();
+            userPosts = allPosts.Where(p => p.UserId == userId).ToList();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading posts: {ex.Message}";
+        }
+    }
+    
+
+    }

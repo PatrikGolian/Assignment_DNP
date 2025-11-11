@@ -1,0 +1,61 @@
+﻿@page "/view-users"
+@using BlazorApp.Services
+@using ApiContracts
+@inject IUserService UserService
+@attribute [Authorize]
+
+
+<h3>View Users</h3>
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+@if (users.Any())
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Username</th>
+            <th>List of posts</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in users)
+        {
+            <tr>
+                <th>@user.Id</th>
+                <th>@user.UserName</th>
+                <th> <a class="card-link" href="/users-posts/@user.Id">See list</a> </th>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+        
+    
+
+@code {
+    private string userName = "";
+    private int userId;
+    private string errorMessage = "";
+    private List<UserDto> users = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsersAsync();
+    }
+
+    private async Task LoadUsersAsync()
+    {
+        try
+        {
+            users = (await UserService.GetUsersAsync()).ToList() ?? new();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading users: {ex.Message}";
+        }
+    }
+
+}

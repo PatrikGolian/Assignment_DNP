@@ -34,7 +34,7 @@ public class HttpUserService : IUserService
 
     public async Task<UserDto?> GetUserAsync(int id)
     {
-        var response = await _client.GetAsync($"users{id}");
+        var response = await _client.GetAsync($"users/{id}");
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<UserDto>() ?? throw new InvalidOperationException("User not found");
     }
