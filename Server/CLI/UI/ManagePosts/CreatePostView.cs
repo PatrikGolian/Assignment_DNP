@@ -27,12 +27,8 @@ public class CreatePostView
         string? userIdInput = Console.ReadLine();
         int userId = int.TryParse(userIdInput, out var uid) ? uid : 0;
 
-        var post = new Post
-        {
-            Title = title ?? string.Empty,
-            Body = body ?? string.Empty,
-            UserId = userId
-        };
+        var post = new Post(title ?? string.Empty, body ?? string.Empty,
+            userId);
 
         Post created = await postRepo.AddAsync(post);
 

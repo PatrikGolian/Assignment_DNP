@@ -21,7 +21,7 @@ public class CreateUserView
         Console.Write("Password: ");
         string? password = Console.ReadLine();
 
-        var user = new User { Username = username!, Password = password! };
+        var user = new User(username = username!, password = password!);
         User created = await userRepo.AddAsync(user);
 
         Console.WriteLine($"User created with ID {created.Id}");

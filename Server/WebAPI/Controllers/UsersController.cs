@@ -33,9 +33,8 @@ public class UsersController : ControllerBase
                 $"Username '{request.UserName}' is already taken.");
         }
 
-        var user = new User
-            { Username = request.UserName, Password = request.Password };
-
+        var user = new User(request.UserName, request.Password);
+        
         User created = await userRepo.AddAsync(user);
 
         UserDto dto = new()

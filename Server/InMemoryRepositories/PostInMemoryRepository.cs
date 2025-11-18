@@ -9,33 +9,33 @@ public class PostInMemoryRepository : IPostRepository
 
     public PostInMemoryRepository()
     {
-        SomeDummyData();
+       // SomeDummyData();
     }
 
-    private void SomeDummyData()
-    {
-        posts.Add(new Post
-        {
-            Id = 1,
-            Title = "Welcome Post",
-            Body = "This is the very first post.",
-            UserId = 1
-        });
-        posts.Add(new Post
-        {
-            Id = 3,
-            Title = "Second Post",
-            Body = "Another example post.",
-            UserId = 2
-        });
-        posts.Add(new Post
-        {
-            Id = 2,
-            Title = "Third Post",
-            Body = "BlaBla",
-            UserId = 3    
-    });
-}
+//     private void SomeDummyData()
+//     {
+//         posts.Add(new Post
+//         {
+//             Id = 1,
+//             Title = "Welcome Post",
+//             Body = "This is the very first post.",
+//             UserId = 1
+//         });
+//         posts.Add(new Post
+//         {
+//             Id = 3,
+//             Title = "Second Post",
+//             Body = "Another example post.",
+//             UserId = 2
+//         });
+//         posts.Add(new Post
+//         {
+//             Id = 2,
+//             Title = "Third Post",
+//             Body = "BlaBla",
+//             UserId = 3    
+//     });
+// }
     
     public Task<Post> AddAsync(Post post)
     {

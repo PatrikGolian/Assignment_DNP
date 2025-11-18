@@ -11,33 +11,33 @@ public class CommentInMemoryRepository : ICommentRepository
     
     public CommentInMemoryRepository()
     {
-        SomeDummyData();
+       // SomeDummyData();
     }
 
-    private void SomeDummyData()
-    {
-        comments.Add(new Comment
-        {
-            Id = 1,
-            Body = "First comment!",
-            PostId = 1,
-            UserId = 2
-        });
-        comments.Add(new Comment
-        {
-            Id = 3,
-            Body = "Second comment.",
-            PostId = 1,
-            UserId = 3
-        });
-        comments.Add(new Comment
-        {
-            Id = 2,
-            Body = "Third comm.",
-            PostId = 2,
-            UserId = 1
-        });
-    }
+    // private void SomeDummyData()
+    // {
+    //     comments.Add(new Comment
+    //     {
+    //         Id = 1,
+    //         Body = "First comment!",
+    //         PostId = 1,
+    //         UserId = 2
+    //     });
+    //     comments.Add(new Comment
+    //     {
+    //         Id = 3,
+    //         Body = "Second comment.",
+    //         PostId = 1,
+    //         UserId = 3
+    //     });
+    //     comments.Add(new Comment
+    //     {
+    //         Id = 2,
+    //         Body = "Third comm.",
+    //         PostId = 2,
+    //         UserId = 1
+    //     });
+    // }
     
     public Task<Comment> AddAsync(Comment comment)
     {

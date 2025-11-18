@@ -25,10 +25,7 @@ public class PostsController : ControllerBase
     public async Task<ActionResult<PostDto>> CreatePost(
         [FromBody] CreatePostDto request)
     {
-        var post = new Post
-        {
-            Title = request.Title, Body = request.Body, UserId = request.UserId
-        };
+        var post = new Post(request.Title, request.Body, request.UserId);
 
         Post created = await postRepo.AddAsync(post);
 

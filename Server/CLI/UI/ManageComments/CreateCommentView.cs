@@ -35,7 +35,7 @@ public class CreateCommentView
         Console.Write("Comment text: ");
         string? body = Console.ReadLine();
 
-        // ✅ Check that the post exists
+        // Check that the post exists
         bool postExists = postRepo.GetManyAsync().Any(p => p.Id == postId);
         if (!postExists)
         {
@@ -54,12 +54,9 @@ public class CreateCommentView
             return;
         }
 
-        var comment = new Comment
-        {
-            Body = body ?? string.Empty,
-            PostId = postId,
-            UserId = userId
-        };
+        
+        var comment = new Comment(body ?? string.Empty, postId, userId);
+
 
         Comment created = await commentRepo.AddAsync(comment);
 
