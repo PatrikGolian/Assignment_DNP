@@ -1,6 +1,7 @@
 ﻿using ApiContracts;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
 namespace WebAPI.Controllers;
@@ -144,21 +145,23 @@ public class UsersController : ControllerBase
         return Ok(dtos);
     }*/
     [HttpGet]
-    public ActionResult<IEnumerable<UserDto>> GetAllUsers([FromQuery] string? search)
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers([FromQuery] string? search)
     {
-        var users = userRepo.GetManyAsync();
+        IQueryable<User> users = userRepo.GetManyAsync();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
             users = users.Where(u =>
-                u.Username.Contains(search, StringComparison.OrdinalIgnoreCase));
+                u.Username.ToLower().Contains(search.ToLower()));
         }
 
-        var dtos = users.Select(u => new UserDto
-        {
-            Id = u.Id,
-            UserName = u.Username
-        }).ToList();
+        var dtos = await users
+            .Select(u => new UserDto
+            {
+                Id = u.Id,
+                UserName = u.Username
+            })
+            .ToListAsync();
 
         return Ok(dtos);
     }
@@ -168,9 +171,7 @@ public class UsersController : ControllerBase
     {
 
         bool exists = userRepo.GetManyAsync()
-            .Any(u =>
-                u.Username.Equals(userName,
-                    StringComparison.OrdinalIgnoreCase));
+            .Any(u => u.Username.ToLower() == userName.ToLower());
         return Task.FromResult(exists);
     }
 

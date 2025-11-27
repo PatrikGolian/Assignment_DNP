@@ -11,6 +11,8 @@ public class AppContext : DbContext
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("Data Source=app.db");
+        optionsBuilder.UseSqlite("Data Source= C:\\Users\\patri\\RiderProjects\\Assignment_DNP\\Server\\EfcRepositories\\app.db");
+        Console.WriteLine("DB PATH: " + Path.GetFullPath("app.db"));
+
     }
 }

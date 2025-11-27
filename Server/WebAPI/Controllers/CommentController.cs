@@ -1,6 +1,7 @@
 ﻿using ApiContracts;
 using ApiContracts.Post;
 using Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Controllers;
 using Microsoft.AspNetCore.Mvc;
@@ -103,46 +104,50 @@ public class CommentController : ControllerBase
     }
     
     [HttpGet]
-    public ActionResult<IEnumerable<CommentDto>> GetAllComments(
+    public async Task<ActionResult<IEnumerable<CommentDto>>> GetAllComments(
         [FromQuery] int? postId,
         [FromQuery] int? userId,
         [FromQuery] string? username)
     {
-        var comments = commentRepo.GetManyAsync();
-        
-        // by post id
+        IQueryable<Comment> comments = commentRepo.GetManyAsync();
+
+        // Filter by post id
         if (postId.HasValue)
         {
             comments = comments.Where(c => c.PostId == postId.Value);
         }
-        
-        // by user id
+
+        // Filter by user id
         if (userId.HasValue)
         {
             comments = comments.Where(c => c.UserId == userId.Value);
         }
-        
-        //  by username
+
+        // Filter by username
         if (!string.IsNullOrWhiteSpace(username))
         {
-            // Need access to users to check names
-            var users = userRepo.GetManyAsync()
-                .Where(u => u.Username.Contains(username, StringComparison.OrdinalIgnoreCase))
-                .Select(u => u.Id)
-                .ToList();
+            string lowerUsername = username.ToLower();
 
-            comments = comments.Where(c => users.Contains(c.UserId));
+            var matchingUserIds = await userRepo.GetManyAsync()
+                .Where(u => u.Username.ToLower().Contains(lowerUsername))
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            comments = comments.Where(c => matchingUserIds.Contains(c.UserId));
         }
 
-        var dtos = comments.Select(c => new CommentDto
-        {
-            Id = c.Id,
-            Body = c.Body,
-            PostId = c.PostId,
-            UserId = c.UserId
-        }).ToList();
+        var dtos = await comments
+            .Select(c => new CommentDto
+            {
+                Id = c.Id,
+                Body = c.Body,
+                PostId = c.PostId,
+                UserId = c.UserId
+            })
+            .ToListAsync();
 
         return Ok(dtos);
     }
+
 
 }

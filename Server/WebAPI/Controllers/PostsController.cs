@@ -2,6 +2,7 @@
 using ApiContracts.Post;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
 
 namespace WebAPI.Controllers;
@@ -75,9 +76,9 @@ public class PostsController : ControllerBase
             return NotFound($"Post with ID {postId} was not found.");
 
         // Get comments and users
-        List<Comment> allComments = commentRepo.GetManyAsync().ToList();
+        List<Comment> allComments =  commentRepo.GetManyAsync().ToList();
         List<Comment> postComments = allComments.Where(c => c.PostId == postId).ToList();
-        List<User> users = userRepo.GetManyAsync().ToList();
+        List<User> users =  userRepo.GetManyAsync().ToList();
 
         // Map comments to DTOs using object initializers (match your DTO shape)
         List<CommentDto> commentDtos = new List<CommentDto>();
@@ -129,46 +130,50 @@ public class PostsController : ControllerBase
     }
     
     [HttpGet]
-    public ActionResult<IEnumerable<PostDto>> GetAllPosts(
+    public async Task<ActionResult<IEnumerable<PostDto>>> GetAllPosts(
         [FromQuery] string? title,
         [FromQuery] int? userId,
         [FromQuery] string? username)
     {
-        var posts = postRepo.GetManyAsync();
+        IQueryable<Post> posts = postRepo.GetManyAsync();
 
-        // by title 
+        // Filter by title
         if (!string.IsNullOrWhiteSpace(title))
         {
-            posts = posts.Where(p =>
-                p.Title.Contains(title, StringComparison.OrdinalIgnoreCase));
+            string lowerTitle = title.ToLower();
+            posts = posts.Where(p => p.Title.ToLower().Contains(lowerTitle));
         }
 
-        // by user id
+        // Filter by user ID
         if (userId.HasValue)
         {
             posts = posts.Where(p => p.UserId == userId.Value);
         }
 
-        //  by username
+        // Filter by username
         if (!string.IsNullOrWhiteSpace(username))
         {
-            // Need access to users to check names
-            var users = userRepo.GetManyAsync()
-                .Where(u => u.Username.Contains(username, StringComparison.OrdinalIgnoreCase))
-                .Select(u => u.Id)
-                .ToList();
+            string lowerUsername = username.ToLower();
 
-            posts = posts.Where(p => users.Contains(p.UserId));
+            // Query users whose username matches
+            var matchingUserIds = await userRepo.GetManyAsync()
+                .Where(u => u.Username.ToLower().Contains(lowerUsername))
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            posts = posts.Where(p => matchingUserIds.Contains(p.UserId));
         }
 
-        var dtos = posts.Select(p => new PostDto
+        // Convert to DTOs (await required!)
+        var dtos = await posts.Select(p => new PostDto
         {
             Id = p.Id,
             Title = p.Title,
             Body = p.Body,
             UserId = p.UserId
-        }).ToList();
+        }).ToListAsync();
 
         return Ok(dtos);
     }
+
 }
